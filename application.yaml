@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: ssh://z@s:2222/media/s/data/git/f2-monitoring.git
+    repoURL: https://github.com/ZombiePm/f2-monitoring.git
     targetRevision: main
     path: .
     directory:
