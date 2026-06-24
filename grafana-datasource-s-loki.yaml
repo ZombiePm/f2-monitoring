@@ -4,7 +4,7 @@ metadata:
   name: s-loki-credentials
   namespace: monitoring
   labels:
-    argocd.argoproj.io/tracking-id: "f2-monitoring-s-loki-datasource:/Secret:monitoring/s-loki-credentials"
+    argocd.argoproj.io/tracking-id: "f2-mon-s-loki:/Secret:monitoring/s-loki-credentials"
 type: Opaque
 stringData:
   username: promtail
@@ -20,7 +20,7 @@ metadata:
   namespace: monitoring
   labels:
     grafana_datasource: "1"
-    argocd.argoproj.io/tracking-id: "f2-monitoring-s-loki-datasource:/ConfigMap:monitoring/s-loki-datasource"
+    argocd.argoproj.io/tracking-id: "f2-mon-s-loki:/ConfigMap:monitoring/s-loki-datasource"
 data:
   s-loki-datasource.yaml: |
     apiVersion: 1
