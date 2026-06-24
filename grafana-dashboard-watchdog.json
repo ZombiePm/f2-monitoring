@@ -1,0 +1,100 @@
+{
+  "title": "Homelab: Watchdog Status (s-Loki)",
+  "uid": "homelab-watchdog",
+  "tags": ["homelab", "watchdog"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "1m",
+  "time": { "from": "now-3h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "OOM events (systemd, last 1h)",
+      "datasource": { "type": "loki", "uid": "loki-s" },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"systemd\"} |= \"(?i)(out of memory|oom-kill|invoked oom)\" [1h]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        }
+      },
+      "options": { "colorMode": "background" }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Docker OOMKilled (last 1h)",
+      "datasource": { "type": "loki", "uid": "loki-s" },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"docker\"} |= \"(?i)(oomkilled|killed process)\" [1h]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "options": { "colorMode": "background" }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Disk errors (last 6h)",
+      "datasource": { "type": "loki", "uid": "loki-s" },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({} |= \"(?i)(no space left|ENOSPC|read-only file system)\" [6h]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "options": { "colorMode": "background" }
+    },
+    {
+      "id": 4,
+      "type": "logs",
+      "title": "Recent OOM events",
+      "datasource": { "type": "loki", "uid": "loki-s" },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 5 },
+      "targets": [
+        {
+          "expr": "{job=\"systemd\"} |= \"(?i)(out of memory|oom-kill|invoked oom|kernel panic|general protection|bug:|oops)\"",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

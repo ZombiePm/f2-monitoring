@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: f2-monitoring-s-loki
+  namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-degraded.slack: f2-alerts
+spec:
+  project: default
+  source:
+    repoURL: ssh://z@s:2222/media/s/data/git/f2-monitoring.git
+    targetRevision: main
+    path: .
+    directory:
+      include: '{grafana-datasource-s-loki.yaml,grafana-dashboards-config.yaml}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

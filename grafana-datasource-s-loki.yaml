@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: s-loki-credentials
+  namespace: monitoring
+  labels:
+    argocd.argoproj.io/tracking-id: "f2-monitoring-s-loki-datasource:/Secret:monitoring/s-loki-credentials"
+type: Opaque
+stringData:
+  username: promtail
+  # Пароль хранится здесь, синхронизируется с /etc/promtail/password на s.
+  # При rotate Vault — обновить вручную: kubectl edit secret -n monitoring s-loki-credentials
+  # Альтернатива: смонтировать через external-secrets-operator (когда появится).
+  password: "ACNwNvXyNXHS6nV7P7L2h9lu7jCdxXeT"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: s-loki-datasource
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+    argocd.argoproj.io/tracking-id: "f2-monitoring-s-loki-datasource:/ConfigMap:monitoring/s-loki-datasource"
+data:
+  s-loki-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+    - name: Loki-s
+      type: loki
+      access: proxy
+      url: https://loki.aeve.ru
+      jsonData:
+        maxLines: 1000
+        tlsSkipVerify: true
+      basicAuth: true
+      basicAuthUser: promtail
+      secureJsonData:
+        basicAuthPassword: "ACNwNvXyNXHS6nV7P7L2h9lu7jCdxXeT"
+      uid: loki-s

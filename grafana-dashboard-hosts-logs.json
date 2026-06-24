@@ -1,0 +1,55 @@
+{
+  "title": "Homelab: Per-Host Log Volume (s-Loki)",
+  "uid": "homelab-hosts-logs",
+  "tags": ["homelab", "loki"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "type": "query",
+        "datasource": { "type": "loki", "uid": "loki-s" },
+        "query": "label_values(host)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Log lines per second",
+      "datasource": { "type": "loki", "uid": "loki-s" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (host) (rate({host=~\"$host\"}[$__interval]))",
+          "refId": "A",
+          "legendFormat": "{{host}}"
+        }
+      ],
+      "options": { "legend": { "displayMode": "table", "placement": "right" } },
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Container log lines per second",
+      "datasource": { "type": "loki", "uid": "loki-s" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 9 },
+      "targets": [
+        {
+          "expr": "sum by (container) (rate({job=\"docker\"}[$__interval]))",
+          "refId": "A",
+          "legendFormat": "{{container}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    }
+  ]
+}

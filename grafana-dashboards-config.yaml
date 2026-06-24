@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: s-loki-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: '1'
+    argocd.argoproj.io/tracking-id: f2-monitoring-s-loki-dashboards:/ConfigMap:monitoring/s-loki-dashboards
+data:
+  homelab-hosts-logs.json: "{\n  \"title\": \"Homelab: Per-Host Log Volume (s-Loki)\"\
+    ,\n  \"uid\": \"homelab-hosts-logs\",\n  \"tags\": [\n    \"homelab\",\n    \"\
+    loki\"\n  ],\n  \"timezone\": \"browser\",\n  \"schemaVersion\": 38,\n  \"refresh\"\
+    : \"30s\",\n  \"time\": {\n    \"from\": \"now-6h\",\n    \"to\": \"now\"\n  },\n\
+    \  \"templating\": {\n    \"list\": [\n      {\n        \"name\": \"host\",\n\
+    \        \"type\": \"query\",\n        \"datasource\": {\n          \"type\":\
+    \ \"loki\",\n          \"uid\": \"loki-s\"\n        },\n        \"query\": \"\
+    label_values(host)\",\n        \"refresh\": 2,\n        \"multi\": true,\n   \
+    \     \"includeAll\": true\n      }\n    ]\n  },\n  \"panels\": [\n    {\n   \
+    \   \"id\": 1,\n      \"type\": \"timeseries\",\n      \"title\": \"Log lines\
+    \ per second\",\n      \"datasource\": {\n        \"type\": \"loki\",\n      \
+    \  \"uid\": \"loki-s\"\n      },\n      \"gridPos\": {\n        \"h\": 9,\n  \
+    \      \"w\": 24,\n        \"x\": 0,\n        \"y\": 0\n      },\n      \"targets\"\
+    : [\n        {\n          \"expr\": \"sum by (host) (rate({host=~\\\"$host\\\"\
+    }[$__interval]))\",\n          \"refId\": \"A\",\n          \"legendFormat\":\
+    \ \"{{host}}\"\n        }\n      ],\n      \"options\": {\n        \"legend\"\
+    : {\n          \"displayMode\": \"table\",\n          \"placement\": \"right\"\
+    \n        }\n      },\n      \"fieldConfig\": {\n        \"defaults\": {\n   \
+    \       \"unit\": \"short\"\n        }\n      }\n    },\n    {\n      \"id\":\
+    \ 2,\n      \"type\": \"timeseries\",\n      \"title\": \"Container log lines\
+    \ per second\",\n      \"datasource\": {\n        \"type\": \"loki\",\n      \
+    \  \"uid\": \"loki-s\"\n      },\n      \"gridPos\": {\n        \"h\": 9,\n  \
+    \      \"w\": 24,\n        \"x\": 0,\n        \"y\": 9\n      },\n      \"targets\"\
+    : [\n        {\n          \"expr\": \"sum by (container) (rate({job=\\\"docker\\\
+    \"}[$__interval]))\",\n          \"refId\": \"A\",\n          \"legendFormat\"\
+    : \"{{container}}\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"\
+    defaults\": {\n          \"unit\": \"short\"\n        }\n      }\n    }\n  ]\n\
+    }"
+  homelab-watchdog.json: "{\n  \"title\": \"Homelab: Watchdog Status (s-Loki)\",\n\
+    \  \"uid\": \"homelab-watchdog\",\n  \"tags\": [\n    \"homelab\",\n    \"watchdog\"\
+    \n  ],\n  \"timezone\": \"browser\",\n  \"schemaVersion\": 38,\n  \"refresh\"\
+    : \"1m\",\n  \"time\": {\n    \"from\": \"now-3h\",\n    \"to\": \"now\"\n  },\n\
+    \  \"panels\": [\n    {\n      \"id\": 1,\n      \"type\": \"stat\",\n      \"\
+    title\": \"OOM events (systemd, last 1h)\",\n      \"datasource\": {\n       \
+    \ \"type\": \"loki\",\n        \"uid\": \"loki-s\"\n      },\n      \"gridPos\"\
+    : {\n        \"h\": 5,\n        \"w\": 6,\n        \"x\": 0,\n        \"y\": 0\n\
+    \      },\n      \"targets\": [\n        {\n          \"expr\": \"sum(count_over_time({job=\\\
+    \"systemd\\\"} |= \\\"(?i)(out of memory|oom-kill|invoked oom)\\\" [1h]))\",\n\
+    \          \"refId\": \"A\"\n        }\n      ],\n      \"fieldConfig\": {\n \
+    \       \"defaults\": {\n          \"thresholds\": {\n            \"mode\": \"\
+    absolute\",\n            \"steps\": [\n              {\n                \"color\"\
+    : \"green\",\n                \"value\": null\n              },\n            \
+    \  {\n                \"color\": \"orange\",\n                \"value\": 1\n \
+    \             },\n              {\n                \"color\": \"red\",\n     \
+    \           \"value\": 5\n              }\n            ]\n          }\n      \
+    \  }\n      },\n      \"options\": {\n        \"colorMode\": \"background\"\n\
+    \      }\n    },\n    {\n      \"id\": 2,\n      \"type\": \"stat\",\n      \"\
+    title\": \"Docker OOMKilled (last 1h)\",\n      \"datasource\": {\n        \"\
+    type\": \"loki\",\n        \"uid\": \"loki-s\"\n      },\n      \"gridPos\": {\n\
+    \        \"h\": 5,\n        \"w\": 6,\n        \"x\": 6,\n        \"y\": 0\n \
+    \     },\n      \"targets\": [\n        {\n          \"expr\": \"sum(count_over_time({job=\\\
+    \"docker\\\"} |= \\\"(?i)(oomkilled|killed process)\\\" [1h]))\",\n          \"\
+    refId\": \"A\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n      \
+    \      \"steps\": [\n              {\n                \"color\": \"green\",\n\
+    \                \"value\": null\n              },\n              {\n        \
+    \        \"color\": \"red\",\n                \"value\": 1\n              }\n\
+    \            ]\n          }\n        }\n      },\n      \"options\": {\n     \
+    \   \"colorMode\": \"background\"\n      }\n    },\n    {\n      \"id\": 3,\n\
+    \      \"type\": \"stat\",\n      \"title\": \"Disk errors (last 6h)\",\n    \
+    \  \"datasource\": {\n        \"type\": \"loki\",\n        \"uid\": \"loki-s\"\
+    \n      },\n      \"gridPos\": {\n        \"h\": 5,\n        \"w\": 6,\n     \
+    \   \"x\": 12,\n        \"y\": 0\n      },\n      \"targets\": [\n        {\n\
+    \          \"expr\": \"sum(count_over_time({} |= \\\"(?i)(no space left|ENOSPC|read-only\
+    \ file system)\\\" [6h]))\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"thresholds\":\
+    \ {\n            \"mode\": \"absolute\",\n            \"steps\": [\n         \
+    \     {\n                \"color\": \"green\",\n                \"value\": null\n\
+    \              },\n              {\n                \"color\": \"red\",\n    \
+    \            \"value\": 1\n              }\n            ]\n          }\n     \
+    \   }\n      },\n      \"options\": {\n        \"colorMode\": \"background\"\n\
+    \      }\n    },\n    {\n      \"id\": 4,\n      \"type\": \"logs\",\n      \"\
+    title\": \"Recent OOM events\",\n      \"datasource\": {\n        \"type\": \"\
+    loki\",\n        \"uid\": \"loki-s\"\n      },\n      \"gridPos\": {\n       \
+    \ \"h\": 14,\n        \"w\": 24,\n        \"x\": 0,\n        \"y\": 5\n      },\n\
+    \      \"targets\": [\n        {\n          \"expr\": \"{job=\\\"systemd\\\"}\
+    \ |= \\\"(?i)(out of memory|oom-kill|invoked oom|kernel panic|general protection|bug:|oops)\\\
+    \"\",\n          \"refId\": \"A\"\n        }\n      ]\n    }\n  ]\n}"
+
