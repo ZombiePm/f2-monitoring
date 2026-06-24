@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
   labels:
     grafana_dashboard: '1'
-    argocd.argoproj.io/tracking-id: f2-mon-s-loki:/ConfigMap:monitoring/s-loki-dashboards
+    argocd.argoproj.io/tracking-id: "f2-mon-s-loki-/ConfigMap-monitoring/s-loki-dashboards"
 data:
   homelab-hosts-logs.json: "{\n  \"title\": \"Homelab: Per-Host Log Volume (s-Loki)\"\
     ,\n  \"uid\": \"homelab-hosts-logs\",\n  \"tags\": [\n    \"homelab\",\n    \"\
