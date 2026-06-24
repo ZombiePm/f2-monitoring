@@ -1,10 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: f2-monitoring-s-loki
+  name: f2-mon-s-loki
   namespace: argocd
   annotations:
     notifications.argoproj.io/subscribe.on-degraded.slack: f2-alerts
+    argocd.argoproj.io/apply-method: server-side
 spec:
   project: default
   source:
@@ -23,3 +24,23 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: s-loki-credentials
+      namespace: monitoring
+      jsonPointers:
+        - /metadata/labels
+    - group: ""
+      kind: ConfigMap
+      name: s-loki-datasource
+      namespace: monitoring
+      jsonPointers:
+        - /metadata/labels
+    - group: ""
+      kind: ConfigMap
+      name: s-loki-dashboards
+      namespace: monitoring
+      jsonPointers:
+        - /metadata/labels
