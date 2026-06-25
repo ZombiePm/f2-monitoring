@@ -34,4 +34,5 @@ data:
       basicAuthUser: promtail
       secureJsonData:
         basicAuthPassword: "ACNwNvXyNXHS6nV7P7L2h9lu7jCdxXeT"
+      isDefault: true
       uid: loki-s
